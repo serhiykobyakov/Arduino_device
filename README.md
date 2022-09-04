@@ -13,7 +13,7 @@ Solution:
 2. Non-native USB boards must say 'Ready!' at the end of their setup process (or say nothing at all) and the initialization process must be capable to deal with this.
 
 
-ArduinoDevice.pas impelemnts a basic Arduino device functionality (serial communication, object initialization and destructon).
+ArduinoDevice.pas - impelemnts a basic Arduino device functionality (serial communication, object initialization and destructon).
 
 device_template.pas - a template for new device. Feel free to change the file name and the variables in it to make your new device.
 
