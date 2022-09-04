@@ -29,7 +29,7 @@ type
 
 implementation
 
-constructor ShutterCD_device.Init(ComPort: string);
+constructor MyNew_device.Init(ComPort: string);
 var
   MyForm: TForm;
   MyLabel: TLabel;
@@ -39,23 +39,23 @@ begin
 // Here we have to give all the necessary device parameters!!!
 
 // the device ID string with which it responds to '?'
-  ShutterCD_device.theDeviceID := 'MyShiningDevice'; // <-- this is the string the device
+  MyNew_device.theDeviceID := 'MyShiningDevice'; // <-- this is the string the device
                                                      // have to answer when we ask '?'
 
 // COM port speed, the default is 115200 in my lab
-  ShutterCD_device.ComPortSpeed := 115200;
+  MyNew_device.ComPortSpeed := 115200;
 
 // max time in ms the device may take for its internal initialization
-  ShutterCD_device.InitTimeout := 300;
+  MyNew_device.InitTimeout := 300;
 
 // max time in ms the device may take before answer
 // this is the longest time the device need to finish a separate command
 // it is good idea to measure it before assign the value
-  ShutterCD_device.LongReadTimeout := 25000;
+  MyNew_device.LongReadTimeout := 25000;
 
 // max time in ms the device may take before answer
 // in the case of simple and fast queries
-  ShutterCD_device.ReadTimeout := 1000;
+  MyNew_device.ReadTimeout := 1000;
 // -----------------------------------------------------------------------------
 
 // make a splash screen
@@ -100,7 +100,7 @@ begin
   FreeAndNil(MyForm);
 end;
 
-destructor ShutterCD_device.Done;
+destructor MyNew_device.Done;
 begin
 // ----------------------------------------------------
 // some device-specific actions which is necessary
@@ -113,7 +113,7 @@ begin
   Inherited Done;
 end;
 
-procedure ShutterCD_device.DoSomething;
+procedure MyNew_device.DoSomething;
 begin
 // I don't use the device answer here to improve reliability
 // but SendAndGetAnswer returns '0' after 'o' if everything is OK
@@ -121,7 +121,7 @@ begin
 end;
 
 
-function ShutterCD_device.GetSomething(SomeInfo: string);
+function MyNew_device.GetSomething(SomeInfo: string);
 begin
 // I don't use the device answer here to improve reliability
 // but SendAndGetAnswer returns '0' after 'c' if everything is OK
