@@ -30,6 +30,7 @@ unit1.pas - Lazarus application main unit.
 
 ### Supported platforms
 Linux (has been tested extensively)
+
 Windows (tested once - successfully)
 
 
