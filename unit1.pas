@@ -6,7 +6,8 @@ interface
 
 uses
   ...
-  Forms, ArduinoDevice, MyNewDevice,
+  Forms, ArduinoDevice, 
+  addfunc, MyNewDevice,
   ...;
 
 type
