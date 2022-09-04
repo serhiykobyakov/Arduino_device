@@ -79,18 +79,21 @@ begin
 // Use basic device initialization
   Inherited Init(ComPort);
 
-
-
 // Do first thing after serial communication with the device
 // have been established
   MyLabel.Caption:= UpperInitStr + 'Do first thing...';
   sleepFor(50); // small delay to refresh the Label
-  SendCharAndGetAnswer('1');
+//  SendCharAndGetAnswer('1');
 
 // Do second thing
   MyLabel.Caption:= UpperInitStr + 'Do second thing...';
   sleepFor(50); // small delay to refresh the Label
-  SendCharAndGetAnswer('2');
+//  SendCharAndGetAnswer('2');
+
+
+
+
+
 
 // ----------------------------------------------------
 
@@ -106,10 +109,11 @@ begin
 // some device-specific actions which is necessary
 // before device shutdown
 
-  SendCharAndGetAnswer('3');
+//  SendCharAndGetAnswer('3');
+
+
 
 // ----------------------------------------------------
-
   Inherited Done;
 end;
 
@@ -117,7 +121,7 @@ procedure MyNew_device.DoSomething;
 begin
 // I don't use the device answer here to improve reliability
 // but SendAndGetAnswer returns '0' after 'o' if everything is OK
-    SendCharAndGetAnswer('1');
+//    SendCharAndGetAnswer('1');
 end;
 
 

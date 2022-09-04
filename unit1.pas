@@ -17,6 +17,7 @@ type
     ...
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure SearchComDevices;
     ...
   private
 
@@ -104,7 +105,7 @@ var
   idstr: string;
 begin
 
-  SearchComDevices;
+  Form1.SearchComDevices;
 
 // Init device
   idstr := 'MyNewDevice';
