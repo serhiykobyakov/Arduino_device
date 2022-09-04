@@ -10,7 +10,7 @@ The problems:
 
 Solution:
 1. Each board has it's own unique ID string with which it responds to '?' query.
-2. Non-native USB boards must say 'Ready!' at the end of their setup process (or say nothing at all) and the initialization process must be capable to deal with this.
+2. Non-native USB boards must say 'Ready!' at the end of their setup process (or say nothing at all). Application which use the devices must be capable to deal with this during device's initialization process.
 
 
 ArduinoDevice.pas - implements a basic Arduino device functionality (serial communication, object initialization and destruction).
