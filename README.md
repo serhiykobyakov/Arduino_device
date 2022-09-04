@@ -19,9 +19,9 @@ device_template.pas - a template for new device. Feel free to change the file na
 
 ### How To Use
 
-1. You need {Lazarus IDE](https://www.lazarus-ide.org/) or Free PAscal on your machine. I suppose that it may work in Delphi also.
+1. You need [Lazarus IDE](https://www.lazarus-ide.org/) or Free PAscal on your machine. I suppose that it may work in Delphi also.
 2. MAke a directory for your project, put ArduinoDevice.pas and device_template.pas in it
-3. Put in your directory jedi.inc, synafpc.pas, synaser.pas, synautil.pas from [Synapse repository] (http://synapse.ararat.cz/doku.php/download)
+3. Put in your directory jedi.inc, synafpc.pas, synaser.pas, synautil.pas from [Synapse repository](http://synapse.ararat.cz/doku.php/download)
 4. Change device_template.pas file name to the device name, edit the code to match it to your device.
 
 
