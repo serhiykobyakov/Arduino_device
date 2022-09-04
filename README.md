@@ -14,7 +14,9 @@ Solution:
 
 
 ArduinoDevice.pas impelemnts a basic Arduino device functionality (serial communication, object initialization and destructon).
+
 device_template.pas - a template for new device. Feel free to change the file name and the variables in it to make your new device.
+
 unit1.pas - Lazarus application main unit.
 
 
