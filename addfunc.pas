@@ -1,11 +1,15 @@
 unit addfunc;
 
-{$mode delphi}
+{ Copyright: (c) Serhiy Kobyakov
+
+Version: 06.09.2022 }
+
 
 interface
 
 uses
   Classes, SysUtils, Dialogs, Forms,
+  FileUtil,
   synaser,
   DateUtils;
 
@@ -24,10 +28,30 @@ function GetArduinoDeviceIDstring(ComPort: string): string;
 var
   ser: TBlockSerial;
   str: string;
+  FindFiles: TStringList;
 begin
   str := '';
-  ser := TBlockSerial.Create;
 
+{$IFDEF Linux}
+// remove lock-file
+// I assume that the application we use have to be the one which use
+// the serial comunication on this PC
+// remove it if it is not the case but be ready to communication failiure
+// when the lock-file exists
+  FindFiles := TStringList.Create;
+  try
+    FindAllFiles(FindFiles, '/var/lock/', '*' + ExtractFileName(ComPort), true);
+    if (FindFiles.Count = 1) then DeleteFile(FindFiles.Strings[0]);
+  finally
+    FindFiles.Clear;
+    FindAllFiles(FindFiles, '/var/lock/', '*' + ExtractFileName(ComPort), true);
+    If FindFiles.Count > 0 then
+      showmessage('Can''t remove lock-file:' + LineEnding + FindFiles.Strings[0]);
+    FindFiles.Free;
+  end;
+{$ENDIF}
+
+  ser := TBlockSerial.Create;
     try
       ser.Connect(ComPort);
       ser.config(115200, 8, 'N', SB1, False, False);
@@ -62,6 +86,7 @@ begin
   end;
 end;
 
+
 procedure SleepFor(msec: longint);
 // non-blocking sleep function
 // allow the PC to do something while the application sleeps
@@ -74,6 +99,7 @@ begin
     tstopwait := Now;
   until MillisecondsBetween(tstopwait, tstartwait) > msec;
 end;
+
 
 end.
 

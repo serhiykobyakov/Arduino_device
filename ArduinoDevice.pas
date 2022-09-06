@@ -2,7 +2,7 @@ unit ArduinoDevice;
 
 { Copyright: (c) Serhiy Kobyakov
 
-Version: 05.09.2022 }
+Version: 06.09.2022 }
 
 
 interface
@@ -10,10 +10,6 @@ interface
 uses
   Classes, Dialogs, SysUtils, DateUtils,
   FileUtil,
-  {$IFDEF Linux}
-//  baseunix,
-  unix,
-  {$ENDIF}
   Controls,
   addfunc,
   synaser;
@@ -101,7 +97,7 @@ end;
 function _ArduinoDevice.SendAndGetAnswer(str: string): string;
 begin
   ser.SendString(str);
-  ser.Flush;
+//  ser.Flush;
   if ser.canread(LongReadTimeout) then
     Result := ser.Recvstring(ReadTimeout)
   else
@@ -116,7 +112,7 @@ end;
 function _ArduinoDevice.SendCharAndGetAnswer(ch: char): string;
 begin
   ser.SendByte(ord(ch));
-  ser.Flush;
+//  ser.Flush;
   if ser.canread(LongReadTimeout) then
     Result := ser.Recvstring(ReadTimeout)
   else
@@ -130,28 +126,8 @@ end;
 
 
 constructor _ArduinoDevice.Init(ComPort: string);
-var
-  FindFiles: TStringList;
 begin
   theComPort := ComPort; // save the com port address to object variables
-
-{$IFDEF Linux}
-// remove lock-file
-// I assume that the application we use have to be the one which use
-// the serial comunication on this PC
-// remove it if it is not the case but be ready to communication failiure
-// when the lock-file exists
-  FindFiles := TStringList.Create;
-  try
-    FindAllFiles(FindFiles, '/var/lock/', '*' + ExtractFileName(ComPort), true);
-    if (FindFiles.Count = 1) then DeleteFile(FindFiles.Strings[0]);
-  finally
-    If FindFiles.Count > 0 then
-//    FileExists(FindFiles.Strings[0]) then
-      showmessage('Can''t remove lock-file:' + LineEnding + FindFiles.Strings[0]);
-    FindFiles.Free;
-  end;
-{$ENDIF}
 
   ser := TBlockSerial.Create;
   try

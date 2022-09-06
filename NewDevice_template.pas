@@ -59,6 +59,7 @@ begin
 // which shows initialization process
   MyForm := TForm.Create(nil);
   with MyForm do begin
+     Caption := theDeviceID + ' initialization...';
      SetBounds(0, 0, 450, 90); Position:=poDesktopCenter; BorderStyle := bsNone;
      MyForm.Color := $00EEEEEE; end;
 
