@@ -1,8 +1,10 @@
 unit ArduinoDevice;
+{
+Base Arduino device unit
+Version: 11.09.2022
 
-{ Copyright: (c) Serhiy Kobyakov
-
-Version: 06.09.2022 }
+(c) Serhiy Kobyakov
+}
 
 
 interface
@@ -11,6 +13,8 @@ uses
   Classes, Dialogs, SysUtils, DateUtils,
   FileUtil,
   Controls,
+  IniFiles,
+  Forms,
   addfunc,
   synaser;
 
@@ -38,11 +42,11 @@ type
       theLongReadTimeout: integer;
       theReadTimeout: integer;
 
-      // send string and get string
+// send string and get string
       function SendAndGetAnswer(str: string): string;
 
-      // send single character and get string
-      // faster communication when you need to send only a single byte
+// send single character and get string
+// faster communication when you need to send a single byte only
       function SendCharAndGetAnswer(ch: char): string;
 
     public
@@ -126,18 +130,49 @@ end;
 
 
 constructor _ArduinoDevice.Init(ComPort: string);
+var
+  iniFile: string;
+  AppIni: TIniFile;
 begin
+  iniFile := Application.Location + theDeviceID + '.ini';
+  If not FileExists(iniFile) then
+    begin
+      showmessage(theDeviceID + ':' + LineEnding +
+          'procedure ''' + {$I %CURRENTROUTINE%} + ''' failed!' + LineEnding +
+          'File ' + iniFile + 'has not been found!' + LineEnding +
+          'Please fix it');
+      halt(0);
+    end;
+
+// Read the device variables from ini file:
+  AppIni := TInifile.Create(iniFile);
+    theComPortSpeed := AppIni.ReadInteger(theDeviceID, 'ComPortSpeed', 115200);
+
+// max time in ms the device may take for its internal initialization
+    theInitTimeout := AppIni.ReadInteger(theDeviceID, 'InitTimeout', 3000);
+
+// max time in ms the device may take before answer
+// it is good idea to measure the longest run
+// before assign the value
+    theLongReadTimeout := AppIni.ReadInteger(theDeviceID, 'LongReadTimeout', 3000);
+
+// max time in ms the device may take before answer
+// in the case of simple and fast queries
+    theReadTimeout := AppIni.ReadInteger(theDeviceID, 'ReadTimeout', 1000);
+  AppIni.Free;
+
   theComPort := ComPort; // save the com port address to object variables
 
+// start serial communication
   ser := TBlockSerial.Create;
   try
     ser.Connect(ComPort);
     ser.config(theComPortSpeed, 8, 'N', SB1, False, False);
     sleepFor(theInitTimeout);
-    ser.SendString('?');
-    if ser.canread(500) then ser.Recvstring(100); // read first answer
+    if ser.canread(500) then  // read if there something in serial port
+      ser.Recvstring(100);    // for example "Ready!"
   finally
-    ser.Flush;
+    ser.Purge;
   end;
 
 end;

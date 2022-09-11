@@ -1,14 +1,18 @@
 unit NewDevice;
+{
+NewDevice unit
+Version -- date --
+
+(c) -- author --
+}
 
 
-{$mode objfpc}{$H+}
 
 interface
 
 uses
   Classes, SysUtils, dialogs, StdCtrls, Controls, Forms,
   IniFiles,
-//  strutils,
   addfunc,
   ArduinoDevice;
 
@@ -41,17 +45,18 @@ var
   UpperInitStr, iniFile: string;
 begin
 // -----------------------------------------------------------------------------
+// first things first
 // the device ID string with which it responds to '?'
   theDeviceID := 'NewDevice';
 // -----------------------------------------------------------------------------
 
   iniFile := Application.Location + theDeviceID + '.ini';
-
   If not FileExists(iniFile) then
     begin
-      showmessage('File ' + LineEnding + iniFile + LineEnding +
-                  'has not been found!' + LineEnding + LineEnding +
-                  'Please fix it');
+      showmessage(theDeviceID + ':' + LineEnding +
+          'procedure ''' + {$I %CURRENTROUTINE%} + ''' failed!' + LineEnding +
+          'File ' + iniFile + 'has not been found!' + LineEnding +
+          'Please fix it');
       halt(0);
     end;
 
@@ -79,24 +84,7 @@ begin
 // -----------------------------------------------------------------------------
 // Read the device variables from ini file:
   AppIni := TInifile.Create(iniFile);
-  theComPortSpeed := AppIni.ReadInteger(theDeviceID, 'ComPortSpeed', 115200);
-
-// max time in ms the device may take for its internal initialization
-  theInitTimeout := AppIni.ReadInteger(theDeviceID, 'InitTimeout', 3000);
-
-// max time in ms the device may take before answer
-// it is good idea to measure the longest run
-// before assign the value
-  theLongReadTimeout := AppIni.ReadInteger(theDeviceID, 'LongReadTimeout', 3000);
-
-// max time in ms the device may take before answer
-// in the case of simple and fast queries
-  theReadTimeout := AppIni.ReadInteger(theDeviceID, 'ReadTimeout', 1000);
-
-// other device-specific paremeters must be found in the ini-file
-// and we read them here:
-
-
+    //fMaxPos := AppIni.ReadInteger(theDeviceID, 'MaxPos', 32800);
   AppIni.Free;
 // -----------------------------------------------------------------------------
 
@@ -105,8 +93,11 @@ begin
   sleepFor(200); // refresh the Label to see the change
   Inherited Init(_ComPort);
 
-// Put here the commands which have to be executed right after
-// we connect to the device:
+// Now, when communication with the device has been established
+// we can send him commands
+// Here we send those commands which are necessary before
+// we start to work with the device
+
 // Set the shutter into the start position as a last step of initialization
 //  MyLabel.Caption:= UpperInitStr + 'Going to starting position...';
 //  sleepFor(50); // small delay to refresh the Label
