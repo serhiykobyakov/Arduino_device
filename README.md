@@ -1,4 +1,4 @@
-# Free Pascal Arduino device base object implementation
+# Arduino device base object implementation
 
 ### What is it
 What if you have few devices based on Arduino boards and want to use them each time without pain? By the pain I mean managing the COM port address each time before use. Would it be better if the devices initialize automatically when you start your main application? By the way, I haven't found the solution before. If you know one - please let me know.
