@@ -11,37 +11,31 @@ import serial.tools.list_ports
 
 class ArduinoDevice:
     """Basic arduino device class"""
-
     # serial communication constants:
     COMPORTPARITY = serial.PARITY_NONE
     COMPORTSTOPBITS = serial.STOPBITS_ONE
     COMPORTBITS = serial.EIGHTBITS
     COMPORTSPEED = 115200
-
     # the longest time which is necessary to send the command to device:
     COMPORTWRITETIMEOUT = 0.2
-
     # the shortest time the device may need to finish the task and give an answer
     COMPORTREADTIMEOUT = 1
-
     # the longest time the device may need to finish the task and give an answer
     COMPORTLONGREADTIMEOUT = 5
-
     # the shortest time between consequent device commands
     # it is not reasonable in this short time to ask the device do something twice
     # in this case it is better that the device just return previous answer
     # to the second inquiry:
     SHORTESTTIMEBETWEENREADS = 0.46
 
-    _device_name = "ArduinoDevice"
-    _device_info = ""
+    _device_name = ""
     _ser = None
 
     def __repr__(self) -> str:
         return f'{self._device_name} at {self._ser.port}'
 
     def __str__(self) -> str:
-        return f'{self._device_info}'
+        return f'{self._device_name} at {self._ser.port}'
 
     @classmethod
     def get_device_id_str(cls, comport) -> str:
@@ -76,22 +70,16 @@ class ArduinoDevice:
         return result.decode()
 
     def __init__(self, comport):
-        """Device initialization - connecting to comport, gathering info etc. """
-        # getting the device info:
-        ports = serial.tools.list_ports.comports()
-        for port in ports:
-            if port.device == comport:
-                # save all comport parameters to info:
-                list_of_strings = [f'{key}: {port.__dict__[key]}' for key in port.__dict__]
-                self._device_info = "\n".join(list_of_strings)
+        """ device initialization - connecting to comport """
 
         # read the device parameters from INI file
         inifname = self._device_name + '.INI'
         config = configparser.ConfigParser()
         config.read(inifname)
-        self.COMPORTSPEED = 0
+        self.COMPORTSPEED = -1
         self.COMPORTSPEED = int(config['serial']['COMPORTSPEED'])
-        if self.COMPORTSPEED == 0:
+        # simple check if we read the config file:
+        if self.COMPORTSPEED == -1:
             print(f"Error reading {inifname} file!")
         self.COMPORTREADTIMEOUT = float(config['serial']['READTIMEOUT'])
         self.COMPORTWRITETIMEOUT = float(config['serial']['WRITETIMEOUT'])
@@ -122,9 +110,27 @@ while establishing _serial communication!")
 
     @property
     def device_info(self) -> str:
-        # getting all the device info into text:
-        list_of_prop = [f'{key}: {self.__dict__[key]}' for key in self.__dict__ if key != "_device_info"]
-        the_info = self._device_info + "\n" + "\n".join(list_of_prop)
+        """ get device-specific attributes as a text """
+        list_of_prop = [f'{key}: {self.__dict__[key]}' for key in self.__dict__]
+        the_info = "\n".join(list_of_prop)
+        return the_info
+
+    @property
+    def serial_info(self) -> str:
+        """ get serial communication attributes as a text """
+        list_of_strings = [f'{key}: {self._ser.__dict__[key]}' for key in self._ser.__dict__]
+        the_info = "\n".join(list_of_strings)
+        return the_info
+
+    @property
+    def comport_info(self) -> str:
+        """ get COM port attributes as a text """
+        list_of_strings = []
+        ports = serial.tools.list_ports.comports()
+        for port in ports:
+            if port.device == self._ser.name:
+                list_of_strings = [f'{key}: {port.__dict__[key]}' for key in port.__dict__]
+        the_info = "\n".join(list_of_strings)
         return the_info
 
     def send_and_get_answer(self, cmd) -> str:

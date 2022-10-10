@@ -15,19 +15,23 @@ class NewDevice(ArduinoDevice):
     # other device-specific variables go here:
 
     def __init__(self, comport):
-        super().__init__(comport)
-        # self.read_basic_parameters(self._device_name + '.INI')
+        # repeat assigning class variables, so they are visible in self.__dict__:
+        self._device_name = self._device_name
+
         # read the device parameters from INI file
-        # all except COMPORTSPEED, TIMEOUT, WRITETIMEOUT, SHORTESTTIMEBETWEENREADS
-        # YOU STILL HAVE TO PUT ALL THE NECESSARY VALUES INTO INI FILE!!!
+        # all except COMPORTSPEED, READTIMEOUT, WRITETIMEOUT, LONGREADTIMEOUT and SHORTESTTIMEBETWEENREADS:
         # config = configparser.ConfigParser()
         # config.read(self._device_name + '.INI')
         # self.[some parameter] = config[self._device_name]['some parameter']
+
+        # start serial communication with the device
+        # this is the place for the line!
+        super().__init__(comport)
 
         # do some default device-specific init actions here:
 
     def __del__(self):
         # do some default device-specific finalization actions here:
 
-        # it must be here to close the serial communication correctly:
+        # this is the place for the line!
         super().__del__()
