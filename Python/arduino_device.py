@@ -3,7 +3,8 @@
 __version__ = '10.10.2022'
 __author__ = 'Serhiy Kobyakov'
 
-# import time
+import time
+import os
 import configparser
 import serial
 import serial.tools.list_ports
@@ -30,6 +31,9 @@ class ArduinoDevice:
 
     _device_name = ""
     _ser = None
+
+    # timestamp of the last communication with the device
+    _lastcomtimestamp = 0.0
 
     def __repr__(self) -> str:
         return f'{self._device_name} at {self._ser.port}'
@@ -71,7 +75,6 @@ class ArduinoDevice:
 
     def __init__(self, comport):
         """ device initialization - connecting to comport """
-
         # read the device parameters from INI file
         inifname = self._device_name + '.INI'
         config = configparser.ConfigParser()
@@ -109,6 +112,14 @@ while establishing _serial communication!")
         self._ser.close()
 
     @property
+    def is_connected(self):
+        """ check if the device is still connected to serial port """
+        if os.path.exists(self._ser.port):
+            return True
+        else:
+            return False
+
+    @property
     def device_info(self) -> str:
         """ get device-specific attributes as a text """
         list_of_prop = [f'{key}: {self.__dict__[key]}' for key in self.__dict__]
@@ -135,13 +146,24 @@ while establishing _serial communication!")
 
     def send_and_get_answer(self, cmd) -> str:
         """ send command and get answer, short timeout """
-        self._ser.write(cmd.encode())
-        return self._ser.readline().strip().decode()
+        if not self.is_connected:
+            print(f"The device{self._device_name} is disconnected!")
+            return ""
+        else:
+            self._ser.write(cmd.encode())
+            answer = self._ser.readline().strip().decode()
+            self._lastcomtimestamp = time.time()
+            return answer
 
     def send_and_get_late_answer(self, cmd) -> str:
         """ send command and get answer, long timeout """
-        self._ser.timeout = self.COMPORTLONGREADTIMEOUT
-        self._ser.write(cmd.encode())
-        answer = self._ser.readline().strip().decode()
-        self._ser.timeout = self.COMPORTREADTIMEOUT
-        return answer
+        if not self.is_connected:
+            print(f"The device{self._device_name} is disconnected!")
+            return ""
+        else:
+            self._ser.timeout = self.COMPORTLONGREADTIMEOUT
+            self._ser.write(cmd.encode())
+            answer = self._ser.readline().strip().decode()
+            self._lastcomtimestamp = time.time()
+            self._ser.timeout = self.COMPORTREADTIMEOUT
+            return answer
