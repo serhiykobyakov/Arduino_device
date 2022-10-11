@@ -14,7 +14,7 @@ So, there must be a way to distinguish the boards, which means there must be a c
 
 ### Protocol in general
 * Commands which a PC sends to Arduino have to be short (ideally it is a single character) without terminator(s). 
-* Arduino sends back answer to every command it receives, either sending back some information (in some defined way - each situation is different) or some previously defined character just to confirm the command have been received.
+* Arduino sends back answer to every command it receives, either sending back information (in some defined way - each situation is different) or some previously defined character just to confirm the command have been received. The answer must be a terminated string so PC software knows where is the end of the answer.
 * There will be a standard command('?') for every board on which they will respond with their individual device names - this is the way to differ boards. Moreover, the boards with non-native USB port (Arduino UNO etc.) will send their name right after the serial communication is initialized.
 * Send '?' command when starting communication with a board, and if it responds immidiately (boards with native USB port) - OK, if not - wait few seconds since it may be a board with non-native USB port and try to read the serial port again. If the device name has been obtained - OK, if not - it may be some other serial device which doesn't understand our protocol.
 
