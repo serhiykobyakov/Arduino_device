@@ -19,7 +19,7 @@ So, there must be a way to distinguish the boards, which means there must be a c
 * Send '?' command when starting communication with a board, and if it responds immidiately (boards with native USB port) - OK, if not - wait few seconds since it may be a board with non-native USB port and try to read the serial port again. If the device name has been obtained - OK, if not - it may be some other serial device which doesn't understand our protocol.
 
 ### Moreover
-* Each device must take it's individual parameters (as well as serial port parameters) from INI file. This wa it would be faster to mnipulate the parametes values while testing devices.
+* Each device must take it's individual parameters (as well as serial port parameters) from INI file. This way it would be faster to mnipulate the parametes values while testing devices.
 
 ### Contact
 For reporting [bugs, suggestions, patches](https://github.com/serhiykobyakov/Arduino_device_FPC/issues)
