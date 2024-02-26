@@ -5,12 +5,12 @@ What if you have few devices based on Arduino boards and want to use them simult
 So, there must be a way to distinguish the boards, which means there must be a communication protocol and some base class which implement it. And since I plan to make a base class - maybe it is a good idea to implement few auxiliary functions.
 
 ### The problems:
-1. There must be a way to distinguish the boards
+1. There must be a way to distinguish the Arduino boards connected to PC
 2. Some boards have non-native USB port and they initialize in about 2 seconds after serial communication have been established. The other boards are ready to work right away. There must be some way to deal with both types.
 
 ### Solutions:
 1. Each board has it's own unique ID string with which it responds to '?' query.
-2. Non-native USB boards must say 'Ready!' at the end of their setup process (or say nothing at all). Application which use the devices must be capable to deal with this during device's initialization process.
+2. Solution is trivial - just make the reading timeout longer than the default value.
 
 ### Protocol in general
 * Commands which a PC sends to Arduino have to be short (ideally it is a single character) without terminator(s). 
