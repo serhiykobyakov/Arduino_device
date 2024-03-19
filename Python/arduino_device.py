@@ -1,6 +1,6 @@
 """ Base Arduino device class """
 
-__version__ = '24.02.2024'
+__version__ = '19.03.2024'
 __author__ = 'Serhiy Kobyakov'
 
 import time
