@@ -1,6 +1,6 @@
 """ Base Arduino device class """
 
-__version__ = '19.03.2024'
+__version__ = '29.03.2024'
 __author__ = 'Serhiy Kobyakov'
 
 import time
@@ -17,7 +17,7 @@ class ArduinoDevice:
     COMPORTSTOPBITS = serial.STOPBITS_ONE
     COMPORTBITS = serial.EIGHTBITS
     COMPORTSPEED = 115200
-    # the longest time which is necessary to send the command to device:
+    # the longest time necessary to send the command to device:
     # COMPORTWRITETIMEOUT = 0.2
     # the shortest time the device may need
     # to finish the task and give an answer
@@ -50,22 +50,13 @@ class ArduinoDevice:
         """get the dictionary of available adruino devices
 in the form of 'device id string': 'the serial port'"""
         ports = serial.tools.list_ports.comports()
-
-        # ~ print("\nserial devices found in system:")
-        # ~ for port in ports:
-            # ~ print(port.device)
-        # ~ print()
-
         dev_dict = {}
-        # ~ print("Scanning serial ports for arduino devices:")
         for port in ports:
             if port.device.find("ttyACM") > 0 or \
                port.device.find("ttyUSB") > 0:
                 arduino_dev = cls.get_device_id_str(port.device)
                 if len(arduino_dev) > 0:
                     dev_dict[arduino_dev] = port.device
-                    # ~ print(arduino_dev, port.device)
-        # ~ print("done!")
         return dev_dict
 
     @classmethod
@@ -95,13 +86,11 @@ in the form of 'device id string': 'the serial port'"""
             result = cls._ser.readline().strip().decode()
             # ~ print(f"{comport}: {result} of len: {len(result)}")
             if 0 < len(result) <= 2:
-                # give it a second chance if the answer is too short
-                # but not zero
-                # ~ print(f"  EE {comport}: can't read answer!")
+                # give it a second chance
+                # if the answer is too short but not zero length
                 cls._ser.flush()
                 cls._ser.write(b'?')
                 result = cls._ser.readline().strip().decode()
-                # ~ print(f"  finally {comport}: {result}")
         finally:
             cls._ser.close()
         return result
