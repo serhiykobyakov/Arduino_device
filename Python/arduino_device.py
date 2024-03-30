@@ -1,42 +1,36 @@
-""" Base Arduino device class """
+"""class ArduinoDevice is a base class
+for devices built on Arduino boards using serial communication"""
 
 __version__ = '29.03.2024'
 __author__ = 'Serhiy Kobyakov'
 
 import time
 import os
+import re
 import configparser
 import serial
 import serial.tools.list_ports
 
 
 class ArduinoDevice:
-    """Basic arduino device class"""
-    # serial communication constants:
+    """Base Arduino device class"""
+    # several values
+    # inherent to Arduino serial port communication:
     COMPORTPARITY = serial.PARITY_NONE
     COMPORTSTOPBITS = serial.STOPBITS_ONE
     COMPORTBITS = serial.EIGHTBITS
+
+    # Speed of serial communication may vary
+    # but for the sake of unification and simplification
+    # let it be 115200 across all devices.
+    # This value have been carefully tested
+    # on various Arduino boards starting from UNO R3
     COMPORTSPEED = 115200
-    # the longest time necessary to send the command to device:
-    # COMPORTWRITETIMEOUT = 0.2
-    # the shortest time the device may need
-    # to finish the task and give an answer
-    # COMPORTREADTIMEOUT = 1
-    # the longest time the device may need
-    # to finish the task and give an answer
-    # COMPORTLONGREADTIMEOUT = 5
-    # the shortest time between consequent device commands
-    # it is not reasonable in this short time
-    # to ask the device do something twice
-    # in this case it is better that the device
-    # just return previous answer
-    # to the second inquiry:
-    # SHORTESTTIMEBETWEENREADS = 0.46
 
     _device_name = ""
     _ser = None
 
-    # timestamp of the last communication with the device
+    # timestamp of the last serial communication
     _lastcomtimestamp = 0.0
 
     def __repr__(self) -> str:
@@ -52,8 +46,9 @@ in the form of 'device id string': 'the serial port'"""
         ports = serial.tools.list_ports.comports()
         dev_dict = {}
         for port in ports:
-            if port.device.find("ttyACM") > 0 or \
-               port.device.find("ttyUSB") > 0:
+            if len(re.findall(r".*ttyACM\d", port)) > 0 or \
+               len(re.findall(r".*ttyUSB\d", port)) > 0 or \
+               len(re.findall(r"^COM\d", port)) > 0:
                 arduino_dev = cls.get_device_id_str(port.device)
                 if len(arduino_dev) > 0:
                     dev_dict[arduino_dev] = port.device
@@ -108,23 +103,19 @@ in the form of 'device id string': 'the serial port'"""
 
     def __init__(self, comport):
         """ device initialization - connecting to comport """
-        self.COMPORTWRITETIMEOUT = 0.2
-        self.COMPORTREADTIMEOUT = 1.
-        self.COMPORTLONGREADTIMEOUT = 2.
-        self.SHORTESTTIMEBETWEENREADS = 0.1
 
         # read the serial port parameters from INI file
         inifname = self._device_name + '.INI'
         with open(inifname, "r") as f:
             config = configparser.ConfigParser()
             config.read_file(f)
-            self.COMPORTSPEED = -1
-            self.COMPORTSPEED = int(config['serial']['COMPORTSPEED'])
-            # simple check if we read the config file:
-            if self.COMPORTSPEED == -1:
-                print(f"Error reading {inifname} file!")
+            self.COMPORTREADTIMEOUT = -1
             self.COMPORTREADTIMEOUT = \
                 float(config['serial']['READTIMEOUT'])
+            if self.COMPORTREADTIMEOUT == -1:
+                print(f"""  {self._device_name} at {comport}:
+  Error reading {inifname} file!""")
+                return
             self.COMPORTWRITETIMEOUT = \
                 float(config['serial']['WRITETIMEOUT'])
             self.COMPORTLONGREADTIMEOUT = \
@@ -152,6 +143,7 @@ in the form of 'device id string': 'the serial port'"""
             print(f"Error: got {result.decode('UTF-8')}, \
 but expected {self._device_name} \
 while establishing _serial communication!")
+            return
 
     def __del__(self):
         self._ser.close()
