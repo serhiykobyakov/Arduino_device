@@ -120,8 +120,6 @@ in the form of 'device id string': 'the serial port'"""
                 float(config['serial']['WRITETIMEOUT'])
             self.COMPORTLONGREADTIMEOUT = \
                 float(config['serial']['LONGREADTIMEOUT'])
-            self.SHORTESTTIMEBETWEENREADS = \
-                float(config['serial']['SHORTESTTIMEBETWEENREADS'])
 
         # connecting to comport:
         self._ser = serial.Serial(port=comport,
