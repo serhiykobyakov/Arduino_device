@@ -9,7 +9,7 @@ Install pyserial package: https://pyserial.readthedocs.io/en/latest/pyserial.htm
 
 Put into your working folder all files except README.md.
 
-Choose the name of your device (I'll refer to it as NewDevice later): it must be string with no spaces, only letters and digits, maybe minus sign or underscore if you like it. You'll need it later practically everywhere.
+Choose the name of your device (I'll refer to it as NewDevice everywhere): it must be string with no spaces, only letters and digits, maybe minus sign or underscore if you like it. You'll need it later practically everywhere.
 
 Rename NewDevice.INI using your device name. Also, edit the section name inside the file if you plan to set some parameters for your device.
 
