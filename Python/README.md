@@ -1,5 +1,5 @@
 
-Software had been tested thoroughly under Linux. It might work under Windows as well, but it hadn't been tested yet.
+Software had been tested thoroughly under Linux. It might also work under Windows as well, but I haven't tested yet.
 
 
 ### Install:
