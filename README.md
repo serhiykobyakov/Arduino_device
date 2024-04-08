@@ -1,4 +1,4 @@
-# Arduino device base object implementation
+# Arduino Device base object implementation
 
 Imagine you have few devices based on Arduino boards connected to PC using usb-serial. The boards are dedicated to different devices. What if you want to use them all simultaneously without managing serial port addresses? Would it be better if the devices initialize automatically when you start your main application? By the way, I haven't found a ready solution before. If you know one - please let me know.
 
