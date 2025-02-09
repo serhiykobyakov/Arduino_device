@@ -3,11 +3,14 @@
 __version__ = '19.02.2024'
 __author__ = 'Serhiy Kobyakov'
 
+
 from arduino_device import ArduinoDevice
 
 
 class NewDevice(ArduinoDevice):
-    """ New Arduino device class template """
+    """
+    New Arduino device class template
+    """
     # define the device name:
     # this is the string with which the device responds to b'?' query
     _device_name = "NewDevice"

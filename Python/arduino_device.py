@@ -13,7 +13,10 @@ import serial.tools.list_ports
 
 
 class ArduinoDevice:
-    """Base Arduino device class"""
+    """
+    Base Arduino device class
+    """
+
     # several values
     # inherent to Arduino serial port communication:
     COMPORTPARITY = serial.PARITY_NONE
@@ -41,14 +44,18 @@ class ArduinoDevice:
 
     @classmethod
     def get_arduino_serial_devices_dict(cls):
-        """get the dictionary of available adruino devices
-in the form of 'device id string': 'the serial port'"""
+        """
+        get the dictionary of available adruino devices
+        in the form of 'device id string': 'the serial port'
+        """
         ports = serial.tools.list_ports.comports()
         dev_dict = {}
         for port in ports:
-            if len(re.findall(r".*ttyACM\d", port)) > 0 or \
-               len(re.findall(r".*ttyUSB\d", port)) > 0 or \
-               len(re.findall(r"^COM\d", port)) > 0:
+            if (
+                len(re.findall(r".*ttyACM\d", port)) > 0
+                or len(re.findall(r".*ttyUSB\d", port)) > 0
+                or len(re.findall(r"^COM\d", port)) > 0
+            ):
                 arduino_dev = cls.get_device_id_str(port.device)
                 if len(arduino_dev) > 0:
                     dev_dict[arduino_dev] = port.device
@@ -56,11 +63,15 @@ in the form of 'device id string': 'the serial port'"""
 
     @classmethod
     def get_device_id_str(cls, comport) -> str:
-        """Returns True if the device is connected at COM port \"comport\""""
-        result = b''
+        """
+        Returns True if the device is connected at COM port \"comport\"
+        """
+        result = b""
         if not isinstance(comport, str):
-            raise TypeError(f"comport: string value expected, \
-            got {type(str)} instead")
+            raise TypeError(
+                "comport: string value expected, "
+                f"got {type(str)} instead"
+            )
         # if the device doesn't respond immediately it may be
         # a board with non-native USB
         # suppose the board has not been initialized yet.
@@ -68,30 +79,34 @@ in the form of 'device id string': 'the serial port'"""
         # If it's not an Arduino,
         # this routine will block the main app
         # for this amount of time (for each device!)
-        cls._ser = serial.Serial(port=comport,
-                                 baudrate=cls.COMPORTSPEED,
-                                 writeTimeout=2.,
-                                 timeout=5.,
-                                 parity=cls.COMPORTPARITY,
-                                 stopbits=cls.COMPORTSTOPBITS,
-                                 bytesize=cls.COMPORTBITS)
+        cls._ser = serial.Serial(
+            port=comport,
+            baudrate=cls.COMPORTSPEED,
+            writeTimeout=2.,
+            timeout=5.,
+            parity=cls.COMPORTPARITY,
+            stopbits=cls.COMPORTSTOPBITS,
+            bytesize=cls.COMPORTBITS
+        )
         try:
             cls._ser.flush()
-            cls._ser.write(b'?')
+            cls._ser.write(b"?")
             result = cls._ser.readline().strip().decode()
             # ~ print(f"{comport}: {result} of len: {len(result)}")
             if 0 < len(result) <= 2:
                 # give it a second chance
                 # if the answer is too short but not zero length
                 cls._ser.flush()
-                cls._ser.write(b'?')
+                cls._ser.write(b"?")
                 result = cls._ser.readline().strip().decode()
         finally:
             cls._ser.close()
         return result
 
     def __new__(cls, comport):
-        """few checks before we start init an instance..."""
+        """
+        few checks before we start init an instance...
+        """
         instance = super().__new__(cls)
 
         # check if ini file exists
@@ -102,7 +117,9 @@ in the form of 'device id string': 'the serial port'"""
         return instance
 
     def __init__(self, comport):
-        """ device initialization - connecting to comport """
+        """
+        device initialization: connecting to comport
+        """
 
         # read the serial port parameters from INI file
         inifname = self._device_name + '.INI'
@@ -113,8 +130,10 @@ in the form of 'device id string': 'the serial port'"""
             self.COMPORTREADTIMEOUT = \
                 float(config['serial']['READTIMEOUT'])
             if self.COMPORTREADTIMEOUT == -1:
-                print(f"""  {self._device_name} at {comport}:
-  Error reading {inifname} file!""")
+                print(
+                    f"  {self._device_name} at {comport}: "
+                    f"Error reading {inifname} file!"
+                )
                 return
             self.COMPORTWRITETIMEOUT = \
                 float(config['serial']['WRITETIMEOUT'])
@@ -122,13 +141,15 @@ in the form of 'device id string': 'the serial port'"""
                 float(config['serial']['LONGREADTIMEOUT'])
 
         # connecting to comport:
-        self._ser = serial.Serial(port=comport,
-                                  baudrate=self.COMPORTSPEED,
-                                  write_timeout=self.COMPORTWRITETIMEOUT,
-                                  timeout=self.COMPORTREADTIMEOUT,
-                                  parity=self.COMPORTPARITY,
-                                  stopbits=self.COMPORTSTOPBITS,
-                                  bytesize=self.COMPORTBITS)
+        self._ser = serial.Serial(
+            port=comport,
+            baudrate=self.COMPORTSPEED,
+            write_timeout=self.COMPORTWRITETIMEOUT,
+            timeout=self.COMPORTREADTIMEOUT,
+            parity=self.COMPORTPARITY,
+            stopbits=self.COMPORTSTOPBITS,
+            bytesize=self.COMPORTBITS
+        )
         if not self._ser.isOpen():
             print(f"Error establishing communication with {comport} device!")
         self._ser.write(b'?')
@@ -138,9 +159,11 @@ in the form of 'device id string': 'the serial port'"""
             result = self._ser.readline().strip()
             self._ser.timeout = self.COMPORTREADTIMEOUT
         if self._device_name != result.decode('UTF-8'):
-            print(f"Error: got {result.decode('UTF-8')}, \
-but expected {self._device_name} \
-while establishing _serial communication!")
+            print(
+                f"Error: got {result.decode('UTF-8')}, "
+                f"but expected {self._device_name} "
+                "while establishing serial communication!"
+            )
             return
 
     def __del__(self):
@@ -148,39 +171,52 @@ while establishing _serial communication!")
 
     @property
     def is_connected(self):
-        """ check if the device is still connected to serial port """
+        """
+        check if the device is still connected to serial port
+        """
         return bool(os.path.exists(self._ser.port))
 
     @property
     def device_info(self) -> str:
-        """ get device-specific attributes as a text """
-        list_of_prop = [f'{key}: {self.__dict__[key]}'
-                        for key in self.__dict__]
+        """
+        get device-specific attributes as a text
+        """
+        list_of_prop = [
+            f'{key}: {self.__dict__[key]}' for key in self.__dict__
+        ]
         the_info = "\n".join(list_of_prop)
         return the_info
 
     @property
     def serial_info(self) -> str:
-        """ get serial communication attributes as a text """
-        list_of_strings = [f'{key}: {self._ser.__dict__[key]}'
-                           for key in self._ser.__dict__]
+        """
+        get serial communication attributes as a text
+        """
+        list_of_strings = [
+            f'{key}: {self._ser.__dict__[key]}' for key in self._ser.__dict__
+        ]
         the_info = "\n".join(list_of_strings)
         return the_info
 
     @property
     def comport_info(self) -> str:
-        """ get COM port attributes as a text """
+        """
+        get COM port attributes as a text 
+        """
         list_of_strings = []
         ports = serial.tools.list_ports.comports()
         for port in ports:
             if port.device == self._ser.name:
-                list_of_strings = [f'{key}: {port.__dict__[key]}'
-                                   for key in port.__dict__]
+                list_of_strings = [
+                    f'{key}: {port.__dict__[key]}' for key in port.__dict__
+                ]
         the_info = "\n".join(list_of_strings)
         return the_info
 
     def send_and_get_answer(self, cmd) -> str:
-        """ send command and get answer, short timeout """
+        """
+        send command and get answer, short timeout
+        """
         if not self.is_connected:
             print(f"The device{self._device_name} is disconnected!")
             return ""
@@ -190,7 +226,9 @@ while establishing _serial communication!")
         return answer
 
     def send_and_get_late_answer(self, cmd) -> str:
-        """ send command and get answer, long timeout """
+        """
+        send command and get answer, long timeout
+        """
         if not self.is_connected:
             print(f"The device{self._device_name} is disconnected!")
             return ""
